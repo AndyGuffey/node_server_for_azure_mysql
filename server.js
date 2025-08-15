@@ -2,8 +2,9 @@ const express = require("express");
 const mysql = require("mysql2");
 const fs = require("fs");
 require("dotenv").config();
-
+const cors = require("cors");
 const app = express();
+app.use(cors());
 
 // Create a connection pool to the database
 const pool = mysql.createPool({
@@ -71,7 +72,8 @@ app.get("/population/:continent", (req, res) => {
   console.log(`GET /population/${req.params.continent} endpoint was hit 🎯`);
   const { continent } = req.params;
 
-  const query = "SELECT SUM(Population) AS total_population FROM country WHERE Continent = ?";
+  const query =
+    "SELECT SUM(Population) AS total_population FROM country WHERE Continent = ?";
   pool.execute(query, [continent], (err, results) => {
     if (err) {
       console.error(`Error fetching population for ${continent}:`, err);
@@ -91,12 +93,14 @@ app.get("/population/:continent", (req, res) => {
  */
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
-  console.log(`Server is live at http://localhost:${PORT}`);
-}).on("error", (error) => {
-  if (error.code === "EADDRINUSE") {
-    console.error("Port is already in use");
-  } else {
-    console.error("Server Error:", error);
-  }
-});
+app
+  .listen(PORT, () => {
+    console.log(`Server is live at http://localhost:${PORT}`);
+  })
+  .on("error", (error) => {
+    if (error.code === "EADDRINUSE") {
+      console.error("Port is already in use");
+    } else {
+      console.error("Server Error:", error);
+    }
+  });
